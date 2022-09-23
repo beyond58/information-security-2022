@@ -93,7 +93,6 @@ def pass_wheels(input, reverse=False):
     wheel_pos = SETTINGS["WHEEL_POS"]
     if reverse:
         for i in range(len(wheel)-1,-1,-1):
-            print(wheel[i])
             input = ETW[(wheel[i]["wire"].find(ETW[(ETW.find(input)+wheel_pos[i])%26])-wheel_pos[i]+26)%26]
     else:
         for i in range(len(wheel)):
