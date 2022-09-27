@@ -5,7 +5,9 @@
 # Install with: pip install bitarray
 
 from ctypes import ArgumentError
+from distutils.util import run_2to3
 import re
+import numpy as np
 from bitarray import bitarray, util as ba_util
 
 # Initial Permutation (IP)
@@ -47,12 +49,8 @@ P8 = [ 5, 2, 6, 3, 7, 4, 9, 8 ]
 MODE_ENCRYPT = 1
 MODE_DECRYPT = 2
 
-'''
-schedule_keys: generate round keys for round function
-returns array of round keys.
-keep in mind that total rounds of S-DES is 2.
-'''
-def schedule_keys(key: bitarray) -> list[bitarray]:
+
+def schedule_keys(key: bitarray) -> bitarray:
     round_keys = []
     permuted_key = bitarray()
 
@@ -118,9 +116,44 @@ mode determines that this function do encryption or decryption.
 '''
 def sdes(text: bitarray, key: bitarray, mode) -> bitarray:
     result = bitarray()
-    
-    # Place your own implementation of S-DES Here
-    
+
+    #IP 초기치환
+    ip = bitarray()
+    for i in IP:
+        ip.append(text[i])
+    text = ip
+
+    #스케쥴 키 생성
+    key = schedule_keys(key)
+
+    #1 Round
+    left = text[0:4]
+    right = text[4::]
+    if mode == 1:
+        f = round(right, key[0])
+    else:
+        f = round(text[4:], key[1])
+    left = left ^ f
+
+    text = right + left
+
+    #2 Round
+    left = text[0:4]
+    right = text[4::]
+    if mode == 1:
+        f = round(right, key[1])
+    else:
+        f = round(right, key[0])
+    left = left ^ f
+
+    # 마지막 라운드를 거칠때 L과 R이 반대
+    text = left + right
+
+    #IP의 역에 치환
+    ip_1 = bitarray()
+    for i in IP_1:
+        ip_1.append(text[i])
+    result = ip_1
     return result
 
 #### DES Sample Program Start
