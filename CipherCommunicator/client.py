@@ -16,7 +16,9 @@ class Receiver(Thread):
     def decrypt(self, ciphertext:bytes) -> bytes:
         # place your own implementation of
         # AES-128-ECB decryption with pycryptodome
-
+        cipher = AES.new(ENCRYPTION_KEY, ciphertext)
+        plaintext = cipher.decypt(ciphertext)
+        plaintext = unpad(plaintext, BLOCK_SIZE)
         return b''
 
     def handle_recv(self, received:bytes):
@@ -34,8 +36,10 @@ class Receiver(Thread):
 def encrypt_message(msg: bytes) -> bytes:
     # place your own implementation of
     # AES-128-ECB encryption with pycryptodome
-
-    return b''
+    text = pad(msg, BLOCK_SIZE)
+    cipher = AES.new(ENCRYPTION_KEY, AES.MODE_ECB)
+    ciphertext = cipher.encrypt(text)
+    return ciphertext
 
 client_socket = socket(AddressFamily.AF_INET, SocketKind.SOCK_STREAM)
 client_socket.connect(('127.0.0.1', 24000))
