@@ -19,7 +19,7 @@ class Receiver(Thread):
         cipher = AES.new(ENCRYPTION_KEY, ciphertext)
         plaintext = cipher.decypt(ciphertext)
         plaintext = unpad(plaintext, BLOCK_SIZE)
-        return b''
+        return plaintext
 
     def handle_recv(self, received:bytes):
         try:
